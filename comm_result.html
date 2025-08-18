@@ -1,0 +1,289 @@
+<!-- comm_result.html : 의사소통 유형 결과표 (최고 유형 강조 + first/다시검사 버튼) -->
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>의사소통 유형 결과</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .card-topbar {
+        height: 8px;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-b from-blue-50 via-purple-50 to-pink-50 min-h-screen p-6"
+  >
+    <div class="max-w-6xl mx-auto">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">
+        의사소통 유형 결과
+      </h1>
+      <p class="text-sm text-gray-600 text-center mb-6">
+        점수는 0~8점 범위이며, 동점이면 여러 유형이 함께 강조됩니다.
+      </p>
+
+      <!-- 최고 유형 요약 -->
+      <div id="topSummary" class="mb-6"></div>
+
+      <!-- 결과 카드들 -->
+      <div id="cards" class="space-y-8"></div>
+
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <button
+          onclick="history.back()"
+          class="px-5 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700"
+        >
+          다시 검사하기
+        </button>
+        <button
+          onclick="location.href='index.html'"
+          class="px-5 py-2 rounded-lg border border-purple-300 bg-white text-purple-700 hover:bg-purple-50"
+        >
+          검사 선택지로
+        </button>
+        <button
+          onclick="window.print()"
+          class="px-5 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50"
+        >
+          인쇄 / PDF 저장
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // 점수 읽기
+      const p = new URLSearchParams(location.search);
+      const scores = {
+        pl: Number(p.get("pl") || 0), // 회유형
+        bl: Number(p.get("bl") || 0), // 비난형
+        sr: Number(p.get("sr") || 0), // 초이성형
+        ir: Number(p.get("ir") || 0), // 산만형
+        cg: Number(p.get("cg") || 0), // 일치형
+      };
+
+      const TRAIT = {
+        pl: "회유형",
+        bl: "비난형",
+        sr: "초이성형",
+        ir: "산만형",
+        cg: "일치형",
+      };
+
+      // 최고점(동점 포함)
+      const maxScore = Math.max(...Object.values(scores));
+      const topKeys = Object.keys(scores).filter((k) => scores[k] === maxScore);
+
+      // 상단 요약
+      document.getElementById("topSummary").innerHTML = `
+      <div class="rounded-xl border border-purple-200 bg-white/70 p-3 flex flex-wrap gap-2 justify-center">
+        <span class="text-sm text-gray-700">가장 높은 유형:</span>
+        ${topKeys
+          .map(
+            (k) => `
+          <span class="text-xs md:text-sm px-3 py-1 rounded-full bg-purple-600 text-white">
+            ${TRAIT[k]} <b>${scores[k]}</b>점
+          </span>
+        `
+          )
+          .join("")}
+      </div>
+    `;
+
+      // 카드 데이터 (사진 레이아웃 참고해 구성)
+      const DATA = {
+        pl: {
+          title: "회유형 (Placating)",
+          resources: ["타인존중", "양육적", "민감성"],
+          blocks: [
+            [
+              "자기 / 타인 / 상황",
+              "자신의 가치·감정보다 다른 사람의 감정에 더 맞추려 함",
+              "타인의 사랑과 수용을 받기 위해 자신을 돌아보지 않는 경향",
+            ],
+            [
+              "특징",
+              "다른 사람과 그가 처한 상황을 우선해 배려함",
+              "갈등을 피하려고 자신의 욕구를 숨기거나 양보함",
+            ],
+            [
+              "장점",
+              "상대의 마음을 세심하게 살피고 공감하며 관계를 따뜻하게 유지",
+            ],
+            [
+              "개선방향",
+              "나는 무엇을 좋아/싫어하는가를 탐색하고, ‘나는 누구인가’에 대해 기록해 보기",
+            ],
+          ],
+        },
+        bl: {
+          title: "비난형 (Blaming)",
+          resources: ["자기주장성", "지도력", "에너지"],
+          blocks: [
+            [
+              "자기 / 타인 / 상황",
+              "자기주장이 강하고 책임 소재를 중시함",
+              "타인의 말·행동을 수용하기보다 통제하려 함",
+            ],
+            [
+              "특징",
+              "의견을 분명히 제시하며 목표지향적",
+              "감정이 격해지면 언성이 높아질 수 있음",
+            ],
+            ["장점", "결단력과 추진력이 있어 집단을 이끌 수 있음"],
+            [
+              "개선방향",
+              "부정적 감정을 공격적으로 표출하기보다 경청을 연습하고, 협력적 언어 사용하기",
+            ],
+          ],
+        },
+        sr: {
+          title: "초이성형 (Super-Reasonable)",
+          resources: ["지성", "주의집중", "문제해결능력"],
+          blocks: [
+            [
+              "자기 / 타인 / 상황",
+              "감정을 잘 드러내지 않고 정확·이성·조용·차분",
+              "감정보다 논리와 원칙을 중시",
+            ],
+            [
+              "특징",
+              "객관적 자료 인용, 분석과 판단에 강점",
+              "상황을 한 걸음 떨어져 체계적으로 봄",
+            ],
+            ["장점", "복잡한 상황을 구조화하고 해결책을 도출"],
+            [
+              "개선방향",
+              "모든 상황이 객관적일 필요는 없음을 받아들이고 감정표현을 연습",
+            ],
+          ],
+        },
+        ir: {
+          title: "산만형 (Irrelevant)",
+          resources: ["유머", "상상력", "자유", "유연성"],
+          blocks: [
+            [
+              "자기 / 타인 / 상황",
+              "생각이 자주 바뀌고 동시에 여러 행동을 함",
+              "불편하면 딴전·농담 등으로 회피",
+            ],
+            [
+              "특징",
+              "주의가 분산되고 한 주제에 집중이 어려움",
+              "분위기를 바꾸는 데 능숙",
+            ],
+            ["장점", "딱딱한 장면에 유머와 생기를 불어넣음"],
+            [
+              "개선방향",
+              "중요한 가치와 목표를 정리하고, 하나씩 끝내는 루틴 만들기",
+            ],
+          ],
+        },
+        cg: {
+          title: "일치형 (Congruent)",
+          resources: ["자존감", "관계능력", "책임감", "현실감각", "타인존중"],
+          blocks: [
+            [
+              "자기 / 타인 / 상황",
+              "자기·타인·상황을 균형 있게 고려",
+              "비언어·언어 메시지가 일치",
+            ],
+            [
+              "특징",
+              "필요 시 단호하고, 감정도 솔직하게 표현",
+              "각자의 역할과 책임을 명확히 함",
+            ],
+            ["장점", "내적 자원을 활용해 안정적으로 소통하고 변화에 유연"],
+            [
+              "개선방향",
+              "현 상태를 주기적으로 점검하고 강점 기반의 행동을 확장",
+            ],
+          ],
+        },
+      };
+
+      const cards = document.getElementById("cards");
+      for (const key of ["pl", "bl", "sr", "ir", "cg"]) {
+        const d = DATA[key];
+        const score = scores[key];
+        const isTop = topKeys.includes(key);
+
+        const card = document.createElement("section");
+        card.className = `rounded-xl overflow-hidden border ${
+          isTop ? "border-purple-300 ring-4 ring-purple-200" : "border-gray-200"
+        } bg-white shadow`;
+
+        card.innerHTML = `
+        <div class="card-topbar w-full ${
+          isTop
+            ? "bg-gradient-to-r from-purple-700 via-purple-500 to-fuchsia-500"
+            : "bg-black"
+        }"></div>
+        <div class="p-4 md:p-6">
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <h2 class="text-lg md:text-xl font-semibold text-gray-800 flex items-center gap-2">
+              ${d.title}
+              ${
+                isTop
+                  ? '<span class="px-2 py-1 text-[11px] rounded bg-purple-600 text-white">최고점</span>'
+                  : ""
+              }
+            </h2>
+            <div class="text-sm text-gray-700"><b>${score}</b> / 8점</div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
+            <!-- 특징(왼쪽 넓게) -->
+            <div class="md:col-span-4">
+              <div class="overflow-hidden border border-gray-200 rounded-lg">
+                <div class="grid grid-cols-1 md:grid-cols-5 bg-gray-50 text-center text-sm font-semibold">
+                  <div class="md:col-span-4 py-2 border-r border-gray-200">특징</div>
+                  <div class="py-2">자원</div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-5">
+                  <!-- 왼쪽: 블럭들 -->
+                  <div class="md:col-span-4 p-4 space-y-3">
+                    ${d.blocks
+                      .map(
+                        (block) => `
+                      <div>
+                        <div class="text-xs font-semibold text-purple-700 mb-1">• ${
+                          block[0]
+                        }</div>
+                        <ul class="text-sm text-gray-700 list-disc ml-5 space-y-1">
+                          ${block
+                            .slice(1)
+                            .map((t) => `<li>${t}</li>`)
+                            .join("")}
+                        </ul>
+                      </div>
+                    `
+                      )
+                      .join("")}
+                  </div>
+                  <!-- 오른쪽: 자원 -->
+                  <div class="p-4 border-t md:border-t-0 md:border-l border-gray-200">
+                    <ul class="text-sm text-gray-800 space-y-2">
+                      ${d.resources
+                        .map(
+                          (r) =>
+                            `<li class="px-2 py-1 rounded bg-purple-50">${r}</li>`
+                        )
+                        .join("")}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 오른쪽 좁은 칼럼 대체(모바일에선 아래로) -->
+            <div class="md:hidden"></div>
+          </div>
+        </div>
+      `;
+        cards.appendChild(card);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>사랑유형 검사 결과</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gradient-to-b from-pink-50 via-pink-100 to-rose-50 text-gray-800 font-sans"
+  >
+    <div class="max-w-5xl mx-auto px-5 py-10">
+      <!-- 헤더 -->
+      <header class="mb-6 text-center">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-pink-700">
+          💖 사랑유형 검사 결과
+        </h1>
+        <p class="mt-2 text-sm text-pink-700">
+          유형별 점수와 설명을 확인하세요. (각 유형 최대 12점)
+        </p>
+      </header>
+
+      <!-- TOP 배지 -->
+      <div id="topBadge" class="hidden mb-4 text-center">
+        <span
+          class="inline-flex items-center gap-2 rounded-full bg-pink-100 px-4 py-1.5 text-sm font-semibold text-pink-700 border border-pink-200"
+        >
+          🌟 최고 유형: <span id="topTypesText"></span>
+        </span>
+      </div>
+
+      <section
+        class="rounded-xl border border-gray-300 overflow-hidden shadow-sm bg-white"
+      >
+        <div class="bg-black text-white px-4 py-2 font-semibold text-sm">
+          사랑유형 결과표
+        </div>
+        <div class="divide-y divide-gray-200" id="resultRows"></div>
+      </section>
+
+      <div class="mt-6 flex flex-wrap gap-3">
+        <button
+          id="copyBtn"
+          class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm hover:bg-gray-50"
+        >
+          결과 복사
+        </button>
+        <a
+          href="test2.html"
+          class="rounded-xl bg-pink-500 text-white px-4 py-2 text-sm font-semibold hover:bg-pink-600"
+          >다시 검사</a
+        >
+        <a
+          href="index.html"
+          class="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm hover:bg-gray-50"
+          >검사 선택으로</a
+        >
+      </div>
+    </div>
+
+    <script>
+      const TYPE_INFO = {
+        coworker: {
+          ko: "동료적 사랑",
+          latin: "Storge",
+          bullets: [
+            "친구에게서 느끼는 우정 같은 사랑",
+            "사랑은 많은 시간과 활동을 공유하는 특별한 우정이라고 기대함",
+            "상대방에 대한 뜨거운 열정보다는 일상적인 헌신이 개입되지는 않으나 깊은 신뢰와 존중에 바탕을 둠",
+            "예) 평생동안 인생의 풍파를 함께 헤쳐 온 동반자 간의 사랑",
+          ],
+        },
+        altruistic: {
+          ko: "이타적 사랑",
+          latin: "Agape",
+          bullets: [
+            "무조건적이고 헌신적으로 타인을 위하고 보살피는 사랑",
+            "조건없이 좋아하고 돌봐주며, 용서하고 베풀어주는 자기 희생적 사랑",
+            "진정한 사랑이란 받는 것이 아니라 주는 것이라고 생각하는 편",
+            "사랑의 조건은 상대가 자신을 얼마나 필요로 하느냐이기 때문에, 더 이상 상대가 자신을 필요로 하지 않는다고 확신하면 사랑이 끝남",
+            "예) 신의 사랑, 부모의 사랑",
+          ],
+        },
+        logical: {
+          ko: "논리적 사랑",
+          latin: "Pragma",
+          bullets: [
+            "현명하게 사랑을 하려는 사람들의 사랑",
+            "자신이 어떤 유형의 상대를 선호하는 기준이 구체적일 뿐만 아니라 자기 자신의 강점과 약점도 충분히 고려하고 있음",
+            "논리적 사랑을 하는 사람이라고 해서 낭만적 가치를 전혀 인정하지 않는 것은 아님",
+            "예) 선이나 중매를 통해 자신에게 적합한 조건을 지닌 상대를 만나고 사랑하게 됨",
+          ],
+        },
+        possessive: {
+          ko: "소유적 사랑",
+          latin: "Mania",
+          bullets: [
+            "사랑이란 상대방을 완전히 소유하는 것이라고 생각하는 동시에 상대로부터 내가 소유당하는 것이라고 생각하는 유형",
+            "사랑할수록 두려워함 — 사랑을 힘겹고 고통스럽다고 여김",
+            "사랑을 얻기 위해 현실적인 노력을 기울임",
+            "상대를 매일 만나는 것을 통해 행복을 느낌",
+            "종종 자신과 상대방의 미래 모습을 상상하기도 함",
+          ],
+        },
+        romantic: {
+          ko: "낭만적 사랑",
+          latin: "Eros",
+          bullets: [
+            "뜨거운 열정이 중요한 요소가 되는 강렬한 사랑",
+            "사랑은 영원할 것이라는 신념, 사랑하는 사람에 대한 계속적인 생각, 사랑을 위해 무엇이든 하려는 충동이 개입됨",
+            "낭만적 사랑을 꿈꾸는 사람은 자신도 동화 속 주인공처럼 상기를 원함",
+            "세상에서 낭만적이고 열정적인 사랑이 가장 중요하다고 믿음",
+            "예) 로미오와 줄리엣식 사랑",
+          ],
+        },
+        playful: {
+          ko: "유희적 사랑",
+          latin: "Ludus",
+          bullets: [
+            "놀이와 같이 재미와 쾌락을 중요시하는 사랑",
+            "사랑은 즐기기 위한 도전, 이기기 위한 시합으로 여기기도 함",
+            "사랑은 헌신보다 재미를 위한 것, 관계에 가장 중요한 것으로 보지 않는 편",
+            "여러 명의 파트너를 둡거나 동시에 사랑하는 것에 양심의 가책을 느끼지 않음",
+            "예) 색의 선호, 아이스브레이킹의 소셜적 사랑에 대한 선호의 다양성",
+          ],
+        },
+      };
+
+      const ORDER = [
+        "coworker",
+        "altruistic",
+        "logical",
+        "possessive",
+        "romantic",
+        "playful",
+      ];
+
+      const params = new URLSearchParams(location.search);
+      const scores = Object.fromEntries(
+        ORDER.map((k) => [k, Number(params.get(k) || 0)])
+      );
+      const maxScore = Math.max(...Object.values(scores));
+      const topTypes = ORDER.filter(
+        (k) => scores[k] === maxScore && maxScore > 0
+      );
+
+      if (topTypes.length) {
+        document.getElementById("topTypesText").textContent = topTypes
+          .map((k) => `${TYPE_INFO[k].ko}`)
+          .join(", ");
+        document.getElementById("topBadge").classList.remove("hidden");
+      }
+
+      const rows = document.getElementById("resultRows");
+
+      ORDER.forEach((k) => {
+        const info = TYPE_INFO[k];
+        const score = scores[k];
+        const isTop = score === maxScore && maxScore > 0;
+        const row = document.createElement("div");
+        row.className = `grid grid-cols-[10rem_1fr_5rem] items-stretch ${
+          isTop ? "bg-pink-50 ring-2 ring-pink-300" : ""
+        }`;
+
+        const left = document.createElement("div");
+        left.className = "px-3 py-4 border-r border-gray-200 bg-gray-50";
+        left.innerHTML = `<div class="font-bold text-gray-800">${info.ko}</div>
+                                <div class="text-xs text-gray-500">${info.latin}</div>`;
+
+        const mid = document.createElement("div");
+        mid.className = "px-4 py-3";
+        const ul = document.createElement("ul");
+        ul.className = "list-disc pl-5 leading-7 text-sm";
+        info.bullets.forEach((t) => {
+          const li = document.createElement("li");
+          li.textContent = t;
+          ul.appendChild(li);
+        });
+        mid.appendChild(ul);
+
+        const right = document.createElement("div");
+        right.className =
+          "relative px-3 py-3 border-l border-gray-200 text-right";
+        const topBadge = isTop
+          ? '<span class="absolute -top-2 -right-2 inline-flex items-center rounded-full bg-pink-500 text-white text-[10px] px-2 py-0.5 shadow">TOP</span>'
+          : "";
+        right.innerHTML = `${topBadge}
+                <div class="text-[11px] text-gray-400">점</div>
+                <div class="text-xl font-extrabold">${score}</div>
+                <div class="mt-2 h-2 rounded bg-gray-100 overflow-hidden">
+                  <div class="h-full bg-gradient-to-r from-pink-300 to-rose-400" style="width: ${
+                    (score / 12) * 100
+                  }%"></div>
+                </div>`;
+
+        row.appendChild(left);
+        row.appendChild(mid);
+        row.appendChild(right);
+        rows.appendChild(row);
+      });
+
+      document.getElementById("copyBtn").addEventListener("click", async () => {
+        const lines = ORDER.map((k) => `${TYPE_INFO[k].ko}: ${scores[k]}`);
+        const topLine = topTypes.length
+          ? `\n최고 유형: ${topTypes.map((k) => TYPE_INFO[k].ko).join(", ")}`
+          : "";
+        const text = "사랑유형 검사 결과\n" + lines.join("\n") + topLine;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (e) {}
+      });
+    </script>
+  </body>
+</html>

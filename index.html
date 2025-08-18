@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>싸이콜로지 페스티벌 심리 검사 부스</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              candy: {
+                yellow: "#FEF9C3",
+                pink: "#FCE7F3",
+                mint: "#D1FAE5",
+                sky: "#E0F2FE",
+                purple: "#EDE9FE",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-gradient-to-b from-white to-candy-sky text-gray-800">
+    <div class="max-w-3xl mx-auto px-5 py-10">
+      <!-- Title -->
+      <header class="text-center mb-8">
+        <h1
+          class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight"
+        >
+          싸이콜로지 페스티벌
+          <span class="whitespace-nowrap">심리 검사 부스</span>
+        </h1>
+        <p class="mt-3 text-sm text-gray-600">
+          원하는 검사를 눌러 바로 시작하세요!
+        </p>
+      </header>
+
+      <div class="space-y-4">
+        <a
+          href="test1.html"
+          class="block w-full flex items-center gap-3 rounded-2xl border border-yellow-200 bg-candy-yellow/70 hover:bg-candy-yellow p-4 shadow-sm hover:shadow transition active:translate-y-px"
+        >
+          <span class="text-xl">🫠</span>
+          <div class="text-left">
+            <div class="font-semibold text-base">스트레스 검사</div>
+            <div class="text-xs text-gray-600">
+              최근 스트레스 수준과 원인 파악
+            </div>
+          </div>
+          <span
+            class="ml-auto inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-white/70 border border-pink-200"
+            >시작하기 →</span
+          >
+        </a>
+
+        <a
+          href="test2.html"
+          class="block w-full flex items-center gap-3 rounded-2xl border border-pink-200 bg-candy-pink/70 hover:bg-candy-pink p-4 shadow-sm hover:shadow transition active:translate-y-px"
+        >
+          <span class="text-xl">💞</span>
+          <div class="text-left">
+            <div class="font-semibold text-base">사랑유형 검사</div>
+            <div class="text-xs text-gray-600">당신의 연애 스타일</div>
+          </div>
+          <span
+            class="ml-auto inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-white/70 border border-yellow-200"
+            >시작하기 →</span
+          >
+        </a>
+
+        <a
+          href="test3.html"
+          class="block w-full flex items-center gap-3 rounded-2xl border border-mint-200 bg-candy-mint/70 hover:bg-candy-mint p-4 shadow-sm hover:shadow transition active:translate-y-px"
+        >
+          <span class="text-xl">🧩</span>
+          <div class="text-left">
+            <div class="font-semibold text-base">성격요인 검사</div>
+            <div class="text-xs text-gray-600">Big Five 성격 요인</div>
+          </div>
+          <span
+            class="ml-auto inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-white/70 border border-emerald-200"
+            >시작하기 →</span
+          >
+        </a>
+
+        <a
+          href="test4.html"
+          class="block w-full flex items-center gap-3 rounded-2xl border border-sky-200 bg-candy-sky/70 hover:bg-candy-sky p-4 shadow-sm hover:shadow transition active:translate-y-px"
+        >
+          <span class="text-xl">🗣️</span>
+          <div class="text-left">
+            <div class="font-semibold text-base">의사소통 검사</div>
+            <div class="text-xs text-gray-600">당신의 커뮤니케이션 스타일</div>
+          </div>
+          <span
+            class="ml-auto inline-flex items-center text-xs font-semibold px-3 py-1 rounded-full bg-white/70 border border-sky-200"
+            >시작하기 →</span
+          >
+        </a>
+      </div>
+    </div>
+  </body>
+</html>

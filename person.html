@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>성격 요인 검사 결과</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .pointer {
+        position: absolute;
+        top: -18px;
+        transform: translateX(-50%);
+        font-size: 14px;
+        line-height: 14px;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-b from-blue-50 via-purple-50 to-pink-50 min-h-screen p-6"
+  >
+    <div class="max-w-5xl mx-auto">
+      <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">
+        성격 요인 검사
+      </h1>
+      <p class="text-sm text-gray-600 leading-relaxed text-center mb-6">
+        성격검사는 성격의 경향성을 나타내지만, 성격의 좋고 나쁨을 나타내는 것이
+        아닙니다. 그리고 검사 결과는 시간에 따라 유동적으로 변화하기도 합니다.
+      </p>
+
+      <!-- 최고점 요약 표시 -->
+      <div id="topSummary" class="mb-6"></div>
+
+      <div id="results" class="space-y-8"></div>
+
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-3">
+        <button
+          onclick="history.back()"
+          class="px-5 py-2 rounded-lg bg-purple-500 text-white hover:bg-purple-600"
+        >
+          다시 검사하기
+        </button>
+        <button
+          onclick="window.print()"
+          class="px-5 py-2 rounded-lg border border-gray-300 bg-white hover:bg-gray-50"
+        >
+          인쇄 / PDF 저장
+        </button>
+        <button
+          onclick="location.href='index.html'"
+          class="px-5 py-2 rounded-lg border border-purple-300 text-purple-700 bg-white hover:bg-purple-50"
+        >
+          검사 선택지로
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // URL 파라미터에서 점수 읽기
+      const params = new URLSearchParams(location.search);
+      const scores = {
+        ex: Number(params.get("ex") || 0), // 외향성
+        ag: Number(params.get("ag") || 0), // 친화성
+        co: Number(params.get("co") || 0), // 성실성
+        ne: Number(params.get("ne") || 0), // 신경증
+        op: Number(params.get("op") || 0), // 개방성
+      };
+
+      const TRAIT_NAME = {
+        ex: "외향성",
+        ag: "친화성",
+        co: "성실성",
+        ne: "신경증",
+        op: "개방성",
+      };
+
+      // 최고 점수(동점 포함)
+      const maxScore = Math.max(...Object.values(scores));
+      const topKeys = Object.keys(scores).filter((k) => scores[k] === maxScore);
+
+      // 상단 요약
+      document.getElementById("topSummary").innerHTML = `
+        <div class="rounded-xl border border-purple-200 bg-white/70 p-3 flex flex-wrap items-center gap-2 justify-center">
+          <span class="text-sm text-gray-700">가장 높은 요인:</span>
+          ${topKeys
+            .map(
+              (k) => `
+                <span class="text-xs md:text-sm px-3 py-1 rounded-full bg-purple-600 text-white">
+                  ${TRAIT_NAME[k]} <b>${scores[k]}</b>점
+                </span>
+              `
+            )
+            .join("")}
+        </div>
+      `;
+
+      // 결과 섹션
+      const SECTIONS = [
+        {
+          key: "ex",
+          title: "외향성 (Extraversion)",
+          left: ["개인활동을 원하는", "조용한", "얌전한", "표현을 적게 하는"],
+          right: ["상호작용을 원하는", "의욕적", "활기찬", "활동적인"],
+        },
+        {
+          key: "ag",
+          title: "친화성 (Agreeableness)",
+          left: ["이성적인", "고집이 강한", "자기주장이 강한"],
+          right: ["감성적인", "동조성이 높은", "너그러운"],
+        },
+        {
+          key: "co",
+          title: "성실성 (Conscientiousness)",
+          left: ["거리낌 없는", "즉흥적", "놀기를 좋아하는"],
+          right: ["양심적인", "인내력 강한", "열심히 하는", "치밀한"],
+        },
+        {
+          key: "ne",
+          title: "신경증 (Neuroticism)",
+          left: ["감정이 온화한", "안정적", "적응이 좋은", "현실적인"],
+          right: ["감정 기복 큼", "변덕스러운", "걱정이 많은", "예민한"],
+        },
+        {
+          key: "op",
+          title: "개방성 (Openness)",
+          left: ["전통적", "보수적", "예술감각이 적은", "관습 지향"],
+          right: ["창조적", "예술감각이 있는", "호기심 많은", "새로운 도전"],
+        },
+      ];
+
+      // 점수 보정 및 등급 구간: 5–13 낮음, 14–16 보통, 17–25 높음
+      function classify(s) {
+        const x = Math.min(25, Math.max(5, Number(s))); // 5~25로 보정
+        if (x <= 13)
+          return { label: "낮음", color: "bg-blue-100 text-blue-700" };
+        if (x <= 16)
+          return { label: "보통", color: "bg-gray-100 text-gray-700" };
+        return { label: "높음", color: "bg-purple-100 text-purple-700" };
+      }
+
+      const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+      // 5~25 점수를 0~100%로 변환
+      const percentFromScore = (s) => clamp(((s - 5) / 20) * 100, 0, 100);
+
+      const container = document.getElementById("results");
+      SECTIONS.forEach((sec) => {
+        const score = Number(scores[sec.key] || 0);
+        const cls = classify(score);
+        const pct = percentFromScore(score);
+        const isTop = topKeys.includes(sec.key);
+
+        const block = document.createElement("section");
+        block.className =
+          `rounded-xl overflow-hidden ${
+            isTop ? "ring-4 ring-purple-300 shadow-purple-200" : ""
+          } ` +
+          `${
+            isTop
+              ? "border border-purple-300 bg-white/95"
+              : "border border-gray-200 bg-white"
+          } shadow`;
+
+        block.innerHTML = `
+          <div class="h-2 w-full ${
+            isTop
+              ? "bg-gradient-to-r from-purple-700 via-purple-500 to-fuchsia-500"
+              : "bg-black"
+          }"></div>
+          <div class="p-4 md:p-6">
+            <div class="flex items-start justify-between gap-4 mb-4">
+              <h2 class="font-semibold text-gray-800 text-lg md:text-xl flex items-center gap-2">
+                ${sec.title}
+                ${
+                  isTop
+                    ? '<span class="px-2 py-1 rounded-md text-[11px] bg-purple-600 text-white">최고점</span>'
+                    : ""
+                }
+              </h2>
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-1 rounded-md text-xs ${cls.color}">${
+          cls.label
+        }</span>
+                <span class="text-sm text-gray-600"><b>${score}</b> 점</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-4 md:gap-6 items-center">
+              <div class="md:col-span-2 text-xs md:text-sm text-gray-700 leading-6">
+                ${sec.left.map((t) => `• ${t}`).join("<br/>")}
+              </div>
+              <div class="md:col-span-1">
+                <div class="relative">
+                  <div class="pointer ${
+                    isTop ? "text-purple-600" : ""
+                  }" style="left:${pct}%;">▼</div>
+                  <div class="h-2 rounded-full ${
+                    isTop ? "bg-purple-100" : "bg-gray-200"
+                  }"></div>
+                  <div class="absolute inset-0 flex items-center justify-between ${
+                    isTop ? "text-purple-300" : "text-gray-300"
+                  } text-lg select-none" aria-hidden="true">
+                    <span>↔</span><span>↔</span>
+                  </div>
+                </div>
+                <div class="mt-2 text-center text-[11px] ${
+                  isTop ? "text-purple-600" : "text-gray-500"
+                }">
+                  *낮음 &nbsp;&nbsp; *보통 &nbsp;&nbsp; *높음
+                </div>
+              </div>
+              <div class="md:col-span-2 text-xs md:text-sm text-gray-700 leading-6 text-right">
+                ${sec.right.map((t) => `• ${t}`).join("<br/>")}
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(block);
+      });
+    </script>
+  </body>
+</html>

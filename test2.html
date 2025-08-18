@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>사랑유형 검사</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body
+    class="bg-gradient-to-b from-pink-50 via-pink-100 to-rose-50 text-gray-800 font-sans"
+  >
+    <div class="max-w-3xl mx-auto px-5 py-10">
+      <header class="text-center mb-8">
+        <h1
+          class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-pink-600"
+        >
+          💝 사랑유형 검사 💝
+        </h1>
+        <p class="mt-3 text-sm text-pink-700">
+          각 문항에 대해 '그렇다', '아니오'로 응답해주세요.
+        </p>
+        <p class="text-xs text-pink-500">
+          당신이 사랑을 할 때의 태도는 어떤가요? 이 검사를 통해 어떤 사랑
+          유형인지 알아 볼 수 있습니다. 당신이 이전에 경험하였거나 현재 진행하고
+          있는 사랑을 생각하면서 응답해 주세요. 문항에는 옳고 그른 답이 없으니,
+          한 문항도 빠트리지 말고 아래의 질문에 솔직하게 응답해주세요. 아니다는
+          1점, 그렇다는 2점으로 채점됩니다.
+        </p>
+      </header>
+
+      <form id="loveForm" class="space-y-6">
+        <!-- 문항은 JS에서 생성 -->
+      </form>
+
+      <div class="mt-8 text-center">
+        <button
+          type="submit"
+          form="loveForm"
+          class="px-6 py-3 rounded-full bg-gradient-to-r from-pink-400 to-rose-400 text-white font-semibold shadow-lg hover:from-pink-500 hover:to-rose-500 transform hover:scale-105 transition"
+        >
+          결과 보기
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const TOTAL_ITEMS = 36;
+      const mappingByType = {
+        coworker: [1, 7, 13, 19, 25, 31],
+        altruistic: [2, 8, 14, 20, 26, 32],
+        logical: [3, 9, 15, 21, 27, 33],
+        possessive: [4, 10, 16, 22, 8, 34],
+        romantic: [5, 11, 17, 23, 29, 35],
+        playful: [6, 12, 18, 24, 30, 36],
+      };
+
+      const typeMeta = {
+        coworker: { name: "동료적 사랑" },
+        altruistic: { name: "이타적 사랑" },
+        logical: { name: "논리적 사랑" },
+        possessive: { name: "소유적 사랑" },
+        romantic: { name: "낭만적 사랑" },
+        playful: { name: "유희적 사랑" },
+      };
+
+      const questions = [
+        "나는 한참 지난 다음 에야 비로소 내가 사랑하고 있음을 알았다.",
+        "애인이 어려운 처지에 빠졌을 때 상대가 바보처럼 행동한다 하더라도 힘껏 도와주려고 노력한다.",
+        "현실적인 관점에서, 나는 사랑을 고백하기 전에 먼저 나의 장래 목표부터 생각해 보아야 한다.",
+        "우리들 사이의 일이 잘 풀리지 않으면 나는 소화가 잘 되지 않는다.",
+        "나는 ‘첫 눈에 반한다’는 것이 가능하다고 생각한다.",
+        "애인에게 나의 태도를 다소 불확실하게 해 두는 것이 언제나 좋다.",
+        "친근감이 생기고 시간이 조금 지난 뒤에 비로소 사랑이 생기게 되는 것이 원칙이다.",
+        "애인을 고통스럽게 하기보다는 차라리 내가 고통을 받겠다.",
+        "애인을 결정하기 전에 인생설계부터 잘해 두는 것이 좋다.",
+        "나는 연애에 실패한 후, 너무나 우울해져 자살까지도 생각해본 적이 있다.",
+        "우리가 처음 키스를 하거나 볼을 비볐을 때, 나는 뚜렷한 성적 반응이 오는 것을 느꼈다.",
+        "연애하는 재미란 둘의 관계를 발전시킴과 동시에 내가 원하는 것을 얻어내는 걸 시험하는데 있다.",
+        "전에 연애 상대였던 사람들 거의 모두와 나는 지금도 좋은 친구 관계를 유지하고 있다.",
+        "나의 애인이 행복하지 않으면 나도 결코 행복해질 수 없다.",
+        "비슷한 배경을 가진 사람끼리 사랑하는 것이 가장 좋다.",
+        "나는 사랑에 빠지면 하도 흥분되어 잠을 이루지 못하는 때가 있다.",
+        "우리는 만나자 마자 서로가 좋아서 키스를 했다.",
+        "사랑하는 애인이라면 나에 대해 모르는 것이 있다 할지라도 그것 때문에 속상해 하지는 않는다.",
+        "최상의 사랑은 오랜 기간의 우정으로부터 싹튼다.",
+        "나는 어느 사람하고 헤어지고 나면 그의 좋은 점을 발견하려고 무진 애를 쓴다.",
+        "애인을 결정할 때 한가지 고려해야 할 점은 ‘그/그녀가 우리 가정을 어떻게 생각하는가’이다.",
+        "애인이 나에게 관심을 보이지 않으면 나는 온몸이 쑤시고 아프다.",
+        "대게 제일 먼저 나의 관심을 끄는 것은 그 사람의 외모이다.",
+        "내가 사귀는 두 애인이 서로 알지 못하도록 교묘하게 재주를 부린 적이 적어도 한 번은 있었다.",
+        "사랑해서 가장 좋은 것은 둘이 함께 살며, 함께 가정을 꾸리고, 함께 아이들을 키우는 것이다.",
+        "애인이 원하는 것을 위해서라면 나는 기꺼이 내가 원하는 것을 희생시킬 수 있다.",
+        "배우자를 결정함에 있어 가장 먼저 고려해야 할 것은 그가 좋은 부모가 될 수 있는가 하는 점이다.",
+        "나는 사랑에 빠지면 다른 일에는 도무지 집중하기가 힘들다.",
+        "그/그녀의 손을 처음 잡았을 때 나는 사랑의 가능성을 감지했다.",
+        "나는 매우 쉽고 빠르게 사랑했던 관계를 잊어버릴 수 있다.",
+        "우리가 언제부터 서로 사랑하게 되었는지 정확히 알 수 없다.",
+        "만약 내 애인에게 내 핏줄이 아닌 자식이 있다면, 나는 그 아이를 내 자식처럼 키우고 사랑하며 보살펴 줄 것이다.",
+        "나는 결혼하고 싶지 않은 사람과는 진정한 사랑을 할 수 없을 것 같다.",
+        "나의 애인이 다른 사람하고 같이 있는 것 같은 생각이 들면 도저히 견딜 수 없다.",
+        "나는 연애를 시작하기 전부터 나의 애인이 될 사람의 모습을 분명히 정해 놓고 있었다.",
+        "나와 다른 사람들과 사이에 있었던 일을 애인이 알게 된다면 매우 속상해 할 것이다.",
+      ];
+
+      const form = document.getElementById("loveForm");
+
+      questions.forEach((q, i) => {
+        const idx = i + 1;
+        const fieldset = document.createElement("fieldset");
+        fieldset.className =
+          "space-y-2 rounded-2xl border border-pink-200 bg-white/80 p-5 shadow-sm hover:shadow-md transition";
+
+        const legend = document.createElement("legend");
+        legend.textContent = `${idx}. ${q}`;
+        legend.className = "font-medium text-pink-800";
+        fieldset.appendChild(legend);
+
+        const options = document.createElement("div");
+        options.className = "flex gap-6";
+
+        [1, 2].forEach((score) => {
+          const labelEl = document.createElement("label");
+          labelEl.className =
+            "flex items-center gap-2 bg-pink-50 px-3 py-2 rounded-full cursor-pointer hover:bg-pink-100";
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = `q${idx}`;
+          input.value = String(score);
+          input.required = true;
+          labelEl.appendChild(input);
+          const span = document.createElement("span");
+          span.textContent = score === 1 ? "아니오" : "그렇다";
+          labelEl.appendChild(span);
+          options.appendChild(labelEl);
+        });
+
+        fieldset.appendChild(options);
+        form.appendChild(fieldset);
+      });
+
+      function sumForType(typeKey) {
+        const nums = mappingByType[typeKey] || [];
+        let sum = 0;
+        for (const n of nums) {
+          const el = form.querySelector(`input[name=q${n}]:checked`);
+          if (!el) return null;
+          sum += parseInt(el.value, 10);
+        }
+        return sum;
+      }
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        for (let n = 1; n <= TOTAL_ITEMS; n++) {
+          if (!form.querySelector(`input[name=q${n}]:checked`)) {
+            alert(`${n}번 문항에 응답해 주세요.`);
+            return;
+          }
+        }
+
+        const scores = {};
+        Object.keys(mappingByType).forEach((k) => {
+          scores[k] = sumForType(k);
+        });
+
+        const entries = Object.entries(scores);
+        const max = Math.max(...entries.map(([k, v]) => v));
+        const topTypes = entries.filter(([k, v]) => v === max).map(([k]) => k);
+
+        const qp = new URLSearchParams({
+          ...Object.fromEntries(entries.map(([k, v]) => [k, String(v)])),
+          top: topTypes.join(","),
+        });
+
+        window.location.href = `love_result.html?${qp.toString()}`;
+      });
+    </script>
+  </body>
+</html>
